@@ -11,13 +11,12 @@ import (
 
 var DB *sql.DB
 
-// Task представляет структуру задачи
 type Task struct {
 	ID      int    `json:"id"`
 	Date    string `json:"date"` // формат YYYYMMDD
 	Title   string `json:"title"`
 	Comment string `json:"comment"`
-	Repeat  string `json:"repeat"` // правило повторения
+	Repeat  string `json:"repeat"`
 }
 
 const schema = `
