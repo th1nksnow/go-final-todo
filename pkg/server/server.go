@@ -6,17 +6,21 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/th1nksnow/go-final-todo/pkg/db"
 )
 
 type Config struct {
 	Port   int
-	WebDir string
+	webDir string
+	dbFile string
 }
 
 func NewConfig() *Config {
 	return &Config{
 		Port:   7540,
-		WebDir: "./web",
+		webDir: "./web",
+		dbFile: "./scheduler.db",
 	}
 }
 
@@ -32,16 +36,33 @@ func (c *Config) GetPort() string {
 	return fmt.Sprintf(":%d", c.Port)
 }
 
+func (c *Config) GetDbFile() string {
+	dbFile := os.Getenv("TODO_DBFILE")
+	if dbFile != "" {
+		c.dbFile = dbFile
+	}
+
+	return fmt.Sprintf(":%s", c.dbFile)
+}
+
 func NewServer() error {
 	config := NewConfig()
+
+	dbFile := config.GetDbFile()
+
+	log.Printf("Initializing database %s", dbFile)
+	if err := db.Init(config.dbFile); err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+
 	port := config.GetPort()
 
-	fileServer := http.FileServer(http.Dir(config.WebDir))
+	fileServer := http.FileServer(http.Dir(config.webDir))
 
 	http.Handle("/", fileServer)
 
 	log.Printf("Starting server on port %s", port)
-	log.Printf("Serving files from: %s", config.WebDir)
+	log.Printf("Serving files from: %s", config.webDir)
 
 	return http.ListenAndServe(port, nil)
 }
