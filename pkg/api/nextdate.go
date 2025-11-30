@@ -10,7 +10,47 @@ import (
 )
 
 func NextDateHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
+	nowStr := r.FormValue("now")
+	date := r.FormValue("date")
+	repeat := r.FormValue("repeat")
+
+	// Валидация параметров
+	if date == "" {
+		http.Error(w, "date parameter is required", http.StatusBadRequest)
+		return
+	}
+
+	if repeat == "" {
+		http.Error(w, "repeat parameter is required", http.StatusBadRequest)
+		return
+	}
+
+	var now time.Time
+	var err error
+
+	if nowStr != "" {
+		now, err = time.Parse(DateFormat, nowStr)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("invalid now parameter: %v", err), http.StatusBadRequest)
+			return
+		}
+	} else {
+		now = time.Now()
+	}
+
+	nextDate, err := NextDate(now, date, repeat)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(nextDate))
 }
 
 func NextDate(now time.Time, dstart string, repeat string) (string, error) {
