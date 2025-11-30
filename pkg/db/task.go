@@ -19,16 +19,6 @@ func AddTask(task *Task) (int64, error) {
 		sql.Named("title", task.Title),
 		sql.Named("comment", task.Comment),
 		sql.Named("repeat", task.Repeat))
-	// if err != nil {
-	// 	return 0, fmt.Errorf("failed to insert task: %v", err)
-	// }
-
-	// id, err := result.LastInsertId()
-	// if err != nil {
-	// 	return 0, fmt.Errorf("failed to get last insert ID: %v", err)
-	// }
-
-	// return id, nil
 	if err == nil {
 		id, err = result.LastInsertId()
 	}
