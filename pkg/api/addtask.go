@@ -80,21 +80,6 @@ func processTaskDate(task *db.Task, dateStr string, now time.Time) error {
 		return errors.New("Неверный формат даты. Ожидаемый формат: ГГГГММДД")
 	}
 
-	// TODO: task.Repeat == "" ???
-	// nextDate, err := NextDate(now, dateStr, task.Repeat)
-	// if err != nil {
-	// 	return fmt.Errorf("Неверный формат правила повторения: %v", err)
-	// }
-	// if !afterNow(date, now) {
-	// 	if task.Repeat != "" {
-	// 		task.Date = nextDate
-	// 	} else {
-	// 		task.Date = now.Format(DateFormat)
-	// 	}
-	// } else {
-	// 	task.Date = dateStr
-	// }
-
 	if task.Repeat != "" {
 		// Проверяем корректность правила повторения и получаем nextDate
 		nextDate, err := NextDate(now, dateStr, task.Repeat)
