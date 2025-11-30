@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func NextDateHandler(w http.ResponseWriter, r *http.Request) {
+func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -243,7 +243,7 @@ func isValidDayInMonth(date time.Time, days []int) bool {
 
 // afterNow возвращает true, если date больше now
 func afterNow(date, now time.Time) bool {
-	dateOnly := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.UTC)
-	nowOnly := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	dateOnly := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+	nowOnly := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	return dateOnly.After(nowOnly)
 }
