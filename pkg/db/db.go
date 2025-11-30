@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -73,5 +74,5 @@ func Close() error {
 	if DB != nil {
 		return DB.Close()
 	}
-	return fmt.Errorf("failed to close database")
+	return errors.New("failed to close database")
 }

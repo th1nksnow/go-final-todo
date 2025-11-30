@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/th1nksnow/go-final-todo/pkg/api"
 	"github.com/th1nksnow/go-final-todo/pkg/db"
 )
 
@@ -56,6 +57,8 @@ func NewServer() error {
 	}
 
 	port := config.GetPort()
+
+	api.Init()
 
 	fileServer := http.FileServer(http.Dir(config.webDir))
 
