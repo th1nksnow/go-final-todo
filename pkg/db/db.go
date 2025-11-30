@@ -10,15 +10,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-var DB *sql.DB
-
-type Task struct {
-	ID      int    `json:"id"`
-	Date    string `json:"date"` // формат YYYYMMDD
-	Title   string `json:"title"`
-	Comment string `json:"comment"`
-	Repeat  string `json:"repeat"`
-}
+var db *sql.DB
 
 const schema = `
 CREATE TABLE IF NOT EXISTS scheduler (
@@ -42,7 +34,7 @@ func Init(dbFile string) error {
 		install = true
 	}
 
-	DB, err = sql.Open("sqlite", dbFile)
+	db, err = sql.Open("sqlite", dbFile)
 	if err != nil {
 		return fmt.Errorf("failed to open database: %v", err)
 	}
@@ -62,7 +54,7 @@ func Init(dbFile string) error {
 
 // createSchema создает таблицы и индексы
 func createSchema() error {
-	_, err := DB.Exec(schema)
+	_, err := db.Exec(schema)
 	if err != nil {
 		return fmt.Errorf("failed to create schema: %v", err)
 	}
@@ -71,8 +63,8 @@ func createSchema() error {
 }
 
 func Close() error {
-	if DB != nil {
-		return DB.Close()
+	if db != nil {
+		return db.Close()
 	}
 	return errors.New("failed to close database")
 }
