@@ -27,7 +27,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var taskReq addTaskRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&taskReq); err != nil {
-		response.Error = fmt.Sprintf("Failed to decode JSON: %v", err)
+		response.Error = fmt.Sprintf("failed to decode JSON: %v", err)
 		writeJSON(w, response, http.StatusBadRequest)
 		return
 	}
@@ -41,7 +41,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := db.AddTask(task)
 	if err != nil {
-		response.Error = fmt.Sprintf("Failed to add Task: %v", err)
+		response.Error = fmt.Sprintf("failed to add Task: %v", err)
 		writeJSON(w, response, http.StatusInternalServerError)
 		return
 	}
@@ -52,7 +52,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 func validateAndProcessTask(taskReq addTaskRequest) (*db.Task, error) {
 	if taskReq.Title == "" {
-		return nil, errors.New("Не указан заголовок задачи")
+		return nil, errors.New("the title is not specified")
 	}
 
 	now := time.Now()
@@ -77,14 +77,14 @@ func processTaskDate(task *db.Task, dateStr string, now time.Time) error {
 
 	date, err := time.Parse(DateFormat, dateStr)
 	if err != nil {
-		return errors.New("Неверный формат даты. Ожидаемый формат: ГГГГММДД")
+		return errors.New("invalid date format. Expected: YYYYMMDD")
 	}
 
 	if task.Repeat != "" {
 		// Проверяем корректность правила повторения и получаем nextDate
 		nextDate, err := NextDate(now, dateStr, task.Repeat)
 		if err != nil {
-			return fmt.Errorf("Неверный формат правила повторения: %v", err)
+			return fmt.Errorf("incorrect format of the repeat rule: %v", err)
 		}
 
 		// Если исходная дата меньше текущей, используем nextDate

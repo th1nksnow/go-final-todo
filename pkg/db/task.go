@@ -1,9 +1,13 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+	"fmt"
+)
 
 type Task struct {
-	ID      int    `json:"id"`
+	ID      string `json:"id"`
 	Date    string `json:"date"` // формат YYYYMMDD
 	Title   string `json:"title"`
 	Comment string `json:"comment"`
@@ -23,4 +27,40 @@ func AddTask(task *Task) (int64, error) {
 		id, err = result.LastInsertId()
 	}
 	return id, err
+}
+
+func Tasks(limit int) ([]*Task, error) {
+	var query string
+	var rows *sql.Rows
+	var err error
+
+	if limit < 1 || limit > 50 {
+		return nil, errors.New("records limit should be in range from 1 to 50")
+	}
+	query = "SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date LIMIT :limit"
+	rows, err = db.Query(query, sql.Named("limit", limit))
+	if err != nil {
+		return nil, fmt.Errorf("failed to query tasks: %v", err)
+	}
+	defer rows.Close()
+
+	var tasks []*Task
+	for rows.Next() {
+		task := &Task{}
+		err := rows.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan task: %v", err)
+		}
+		tasks = append(tasks, task)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating tasks: %v", err)
+	}
+
+	if tasks == nil {
+		tasks = make([]*Task, 0)
+	}
+
+	return tasks, nil
 }
