@@ -15,6 +15,53 @@ type Task struct {
 	Repeat  string `json:"repeat"`
 }
 
+// GetTask возвращает задачу по её ID
+func GetTask(id string) (*Task, error) {
+	query := `SELECT id, date, title, comment, repeat FROM scheduler WHERE id = :id`
+
+	row := db.QueryRow(query, sql.Named("id", id))
+
+	task := &Task{}
+	err := row.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("task not found")
+		}
+		return nil, fmt.Errorf("failed to get task: %v", err)
+	}
+
+	return task, nil
+}
+
+// UpdateTask обновляет существующую задачу
+func UpdateTask(task *Task) error {
+	query := `UPDATE scheduler SET date = :date, title = :title, comment = :comment, repeat = :repeat WHERE id = :id`
+
+	result, err := db.Exec(query,
+		sql.Named("date", task.Date),
+		sql.Named("title", task.Title),
+		sql.Named("comment", task.Comment),
+		sql.Named("repeat", task.Repeat),
+		sql.Named("id", task.ID))
+
+	if err != nil {
+		return fmt.Errorf("failed to update task: %v", err)
+	}
+
+	// Проверяем, была ли обновлена хотя бы одна запись
+	count, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %v", err)
+	}
+
+	if count == 0 {
+		return errors.New("incorrect id for updating task")
+	}
+
+	return nil
+}
+
 func AddTask(task *Task) (int64, error) {
 	var id int64
 	query := `INSERT INTO scheduler (date, title, comment, repeat) VALUES (:date, :title, :comment, :repeat)`
