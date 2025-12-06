@@ -26,7 +26,7 @@ func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 	task, err := db.GetTask(id)
 	if err != nil {
 		response.Error = err.Error()
-		writeJSON(w, response, http.StatusNotFound)
+		writeJSON(w, response, http.StatusInternalServerError)
 		return
 	}
 

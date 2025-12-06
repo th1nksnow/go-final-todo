@@ -54,7 +54,7 @@ func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	err = db.UpdateTask(task)
 	if err != nil {
 		response.Error = err.Error()
-		writeJSON(w, response, http.StatusNotFound)
+		writeJSON(w, response, http.StatusInternalServerError)
 		return
 	}
 
