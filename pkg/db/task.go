@@ -77,6 +77,54 @@ func AddTask(task *Task) (int64, error) {
 	return id, err
 }
 
+// DeleteTask удаляет задачу по её ID
+func DeleteTask(id string) error {
+	query := `DELETE FROM scheduler WHERE id = :id`
+
+	result, err := db.Exec(query, sql.Named("id", id))
+
+	if err != nil {
+		return fmt.Errorf("failed to delete task: %v", err)
+	}
+
+	// Проверяем, была ли удалена хотя бы одна запись
+	count, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %v", err)
+	}
+
+	if count == 0 {
+		return errors.New("incorrect id for deleting task")
+	}
+
+	return nil
+}
+
+// UpdateDate обновляет только дату задачи
+func UpdateDate(id string, date string) error {
+	query := `UPDATE scheduler SET date = :date WHERE id = :id`
+
+	result, err := db.Exec(query,
+		sql.Named("date", date),
+		sql.Named("id", id))
+
+	if err != nil {
+		return fmt.Errorf("failed to update task date: %v", err)
+	}
+
+	// Проверяем, была ли обновлена хотя бы одна запись
+	count, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %v", err)
+	}
+
+	if count == 0 {
+		return errors.New("incorrect id for updating task date")
+	}
+
+	return nil
+}
+
 func Tasks(search string, limit int) ([]*Task, error) {
 	var query string
 	var rows *sql.Rows

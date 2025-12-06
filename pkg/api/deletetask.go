@@ -7,7 +7,7 @@ import (
 	"github.com/th1nksnow/go-final-todo/pkg/db"
 )
 
-func getTaskHandler(w http.ResponseWriter, r *http.Request) {
+func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var response taskResponse
 
 	id := r.FormValue("id")
@@ -23,18 +23,13 @@ func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := db.GetTask(id)
+	// Удаляем задачу из БД
+	err := db.DeleteTask(id)
 	if err != nil {
 		response.Error = err.Error()
 		writeJSON(w, response, http.StatusInternalServerError)
 		return
 	}
 
-	response.ID = task.ID
-	response.Date = task.Date
-	response.Title = task.Title
-	response.Comment = task.Comment
-	response.Repeat = task.Repeat
-
-	writeJSON(w, response, http.StatusOK)
+	writeJSON(w, struct{}{}, http.StatusOK)
 }
