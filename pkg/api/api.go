@@ -6,12 +6,25 @@ import (
 	"net/http"
 )
 
+type taskResponse struct {
+	ID      string `json:"id,omitempty"`
+	Date    string `json:"date,omitempty"`
+	Title   string `json:"title,omitempty"`
+	Comment string `json:"comment,omitempty"`
+	Repeat  string `json:"repeat,omitempty"`
+	Error   string `json:"error,omitempty"`
+}
+
 func taskHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	switch r.Method {
+	case http.MethodGet:
+		getTaskHandler(w, r)
 	case http.MethodPost:
 		addTaskHandler(w, r)
+	case http.MethodPut:
+		updateTaskHandler(w, r)
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}

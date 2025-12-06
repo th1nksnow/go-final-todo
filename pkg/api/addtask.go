@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/th1nksnow/go-final-todo/pkg/db"
@@ -17,13 +18,8 @@ type addTaskRequest struct {
 	Repeat  string `json:"repeat"`
 }
 
-type addTaskResponse struct {
-	ID    int    `json:"id,omitempty"`
-	Error string `json:"error,omitempty"`
-}
-
 func addTaskHandler(w http.ResponseWriter, r *http.Request) {
-	var response addTaskResponse
+	var response taskResponse
 	var taskReq addTaskRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&taskReq); err != nil {
@@ -46,7 +42,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.ID = int(id)
+	response.ID = strconv.FormatInt(id, 10)
 	writeJSON(w, response, http.StatusOK)
 }
 
