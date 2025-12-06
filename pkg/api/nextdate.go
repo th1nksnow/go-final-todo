@@ -7,11 +7,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/th1nksnow/go-final-todo/pkg/db"
 )
 
 func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -34,7 +36,7 @@ func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	if nowStr != "" {
-		now, err = time.Parse(DateFormat, nowStr)
+		now, err = time.Parse(db.DateFormat, nowStr)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("invalid now parameter: %v", err), http.StatusBadRequest)
 			return
@@ -107,7 +109,7 @@ func nextDateDaily(now, date time.Time, parts []string) (string, error) {
 		}
 	}
 
-	return result.Format(DateFormat), nil
+	return result.Format(db.DateFormat), nil
 }
 
 // nextDateYearly обрабатывает правило "y"
@@ -119,7 +121,7 @@ func nextDateYearly(now, date time.Time) (string, error) {
 			break
 		}
 	}
-	return result.Format(DateFormat), nil
+	return result.Format(db.DateFormat), nil
 }
 
 // nextDateWeekly обрабатывает правило "w <дни_недели>"
@@ -159,7 +161,7 @@ func nextDateWeekly(now, date time.Time, parts []string) (string, error) {
 		}
 	}
 
-	return result.Format(DateFormat), nil
+	return result.Format(db.DateFormat), nil
 }
 
 // nextDateMonthly обрабатывает правило "m <дни> [месяцы]"
@@ -215,7 +217,7 @@ func nextDateMonthly(now, date time.Time, parts []string) (string, error) {
 		}
 	}
 
-	return result.Format(DateFormat), nil
+	return result.Format(db.DateFormat), nil
 }
 
 // isValidDayInMonth проверяет, подходит ли день месяца
