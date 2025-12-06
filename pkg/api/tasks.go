@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/th1nksnow/go-final-todo/pkg/db"
 )
@@ -20,9 +21,12 @@ func tasksHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tasks, err := db.Tasks(50)
+	search := strings.TrimSpace(r.FormValue("search"))
+
+	tasks, err := db.Tasks(search, 50)
 	if err != nil {
-		writeJSON(w, "failed to get tasks: "+err.Error(), http.StatusInternalServerError)
+		response.Error = "failed to get tasks: " + err.Error()
+		writeJSON(w, response, http.StatusInternalServerError)
 		return
 	}
 

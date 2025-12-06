@@ -71,11 +71,11 @@ func validateAndProcessTask(taskReq addTaskRequest) (*db.Task, error) {
 
 func processTaskDate(task *db.Task, dateStr string, now time.Time) error {
 	if dateStr == "" {
-		task.Date = now.Format(DateFormat)
+		task.Date = now.Format(db.DateFormat)
 		return nil
 	}
 
-	date, err := time.Parse(DateFormat, dateStr)
+	date, err := time.Parse(db.DateFormat, dateStr)
 	if err != nil {
 		return errors.New("invalid date format. Expected: YYYYMMDD")
 	}
@@ -98,7 +98,7 @@ func processTaskDate(task *db.Task, dateStr string, now time.Time) error {
 		if afterNow(date, now) {
 			task.Date = dateStr
 		} else {
-			task.Date = now.Format(DateFormat)
+			task.Date = now.Format(db.DateFormat)
 		}
 	}
 

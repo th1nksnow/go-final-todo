@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 )
 
 type Task struct {
@@ -29,7 +30,7 @@ func AddTask(task *Task) (int64, error) {
 	return id, err
 }
 
-func Tasks(limit int) ([]*Task, error) {
+func Tasks(search string, limit int) ([]*Task, error) {
 	var query string
 	var rows *sql.Rows
 	var err error
@@ -37,12 +38,33 @@ func Tasks(limit int) ([]*Task, error) {
 	if limit < 1 || limit > 50 {
 		return nil, errors.New("records limit should be in range from 1 to 50")
 	}
-	query = "SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date LIMIT :limit"
-	rows, err = db.Query(query, sql.Named("limit", limit))
+
+	if search != "" {
+		if parsedDate, err := time.Parse("02.01.2006", search); err == nil {
+			dateStr := parsedDate.Format(DateFormat)
+			query := `SELECT id, date, title, comment, repeat FROM scheduler
+	          WHERE date = :date
+	          ORDER BY date LIMIT :limit`
+			rows, err = db.Query(query,
+				sql.Named("date", dateStr),
+				sql.Named("limit", limit))
+		} else {
+			query := `SELECT id, date, title, comment, repeat FROM scheduler
+	          WHERE title LIKE :search OR comment LIKE :search
+	          ORDER BY date LIMIT :limit`
+			rows, err = db.Query(query,
+				sql.Named("search", "%"+search+"%"),
+				sql.Named("limit", limit))
+		}
+	} else {
+		query = "SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date LIMIT :limit"
+		rows, err = db.Query(query,
+			sql.Named("limit", limit))
+	}
+	defer rows.Close()
 	if err != nil {
 		return nil, fmt.Errorf("failed to query tasks: %v", err)
 	}
-	defer rows.Close()
 
 	var tasks []*Task
 	for rows.Next() {
