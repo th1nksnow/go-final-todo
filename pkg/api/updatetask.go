@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/th1nksnow/go-final-todo/pkg/db"
@@ -23,19 +22,6 @@ type updateTaskRequest struct {
 func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var response taskResponse
 	var taskReq updateTaskRequest
-
-	id := r.FormValue("id")
-	if id == "" {
-		response.Error = "id not specified"
-		writeJSON(w, response, http.StatusBadRequest)
-		return
-	}
-
-	if _, err := strconv.Atoi(id); err != nil {
-		response.Error = "invalid id format"
-		writeJSON(w, response, http.StatusBadRequest)
-		return
-	}
 
 	if err := json.NewDecoder(r.Body).Decode(&taskReq); err != nil {
 		response.Error = fmt.Sprintf("failed to decode JSON: %v", err)
