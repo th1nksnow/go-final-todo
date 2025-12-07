@@ -130,7 +130,7 @@ func Tasks(search string, limit int) ([]*Task, error) {
 	var rows *sql.Rows
 	var err error
 
-	if limit < 1 || limit > 50 {
+	if limit < 1 || limit > DefaultTasksLimit {
 		return nil, errors.New("records limit should be in range from 1 to 50")
 	}
 

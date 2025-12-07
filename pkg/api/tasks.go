@@ -23,7 +23,7 @@ func tasksHandler(w http.ResponseWriter, r *http.Request) {
 
 	search := strings.TrimSpace(r.FormValue("search"))
 
-	tasks, err := db.Tasks(search, 50)
+	tasks, err := db.Tasks(search, db.DefaultTasksLimit)
 	if err != nil {
 		response.Error = "failed to get tasks: " + err.Error()
 		writeJSON(w, response, http.StatusInternalServerError)
