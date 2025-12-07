@@ -77,7 +77,13 @@ curl localhost:7540
 
 ### Custom configuration
 
-Для изменения конфигурации используйте флаги `--env` или `--env-file` при запуске контейнера:
+Чтобы изменить дефолтный порт работы приложения, при его сборке укажите значение переменной `TODO_PORT` с помощью флага `--build-arg`:
+
+```bash
+docker build --build-arg TODO_PORT=${SPECIFIED_PORT} -t ${IMAGE_NAME}:${IMAGE_TAG} .
+```
+
+Для изменения конфигурации при запуске контейнера используйте флаги `--env` или `--env-file`:
 
 ```bash
 docker run -p ${HOST_PORT}:${SPECIFIED_PORT} --env-file ${PATH_TO_ENV_FILE} ${IMAGE_NAME}:${IMAGE_TAG}

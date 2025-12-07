@@ -17,11 +17,13 @@ RUN go build -o /app/todo-app ./main.go
 
 FROM alpine:latest
 
+ARG TODO_PORT=7540
+
 RUN addgroup -S app && adduser -S todo-app -G app
 RUN mkdir -p /app/web /app/data
 RUN chown -R todo-app:app /app
 
-ENV TODO_PORT=7540
+ENV TODO_PORT=${TODO_PORT}
 ENV TODO_DBFILE=/app/data/scheduler.db
 ENV TODO_PASSWORD=""
 
@@ -35,6 +37,6 @@ RUN chown -R todo-app:app /app
 
 USER todo-app
 
-EXPOSE 7540
+EXPOSE ${TODO_PORT}
 
 ENTRYPOINT ["/app/todo-app"]
