@@ -26,8 +26,8 @@ jobs:
 
     - name: Run local server
       run: |
+        export TODO_PASSWORD=${TODO_PASSWORD}
         CGO_ENABLED=0 GOOS=linux go run main.go &
         sleep 100
         go test -run ^TestApp$ ./tests
-        
         
