@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -36,12 +35,12 @@ type Claims struct {
 
 func auth(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Если пароль не установлен, пропускаем аутентификацию
-		password := os.Getenv("TODO_PASSWORD")
-		if password == "" {
+		if !cfgApi.authEnabled {
 			next(w, r)
 			return
 		}
+
+		password := cfgApi.password
 
 		var tokenString string
 		cookie, err := r.Cookie(tokenCookieName)
@@ -135,14 +134,13 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expectedPassword := os.Getenv("TODO_PASSWORD")
-	if expectedPassword == "" {
-		// Если пароль не установлен, авторизация не требуется
+	if !cfgApi.authEnabled {
 		response.Error = "authentication is not configured"
 		writeJSON(w, response, http.StatusBadRequest)
 		return
 	}
 
+	expectedPassword := cfgApi.password
 	if req.Password != expectedPassword {
 		response.Error = "invalid password"
 		writeJSON(w, response, http.StatusUnauthorized)
